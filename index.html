@@ -26,28 +26,18 @@
         /* === ESTILO VISUAL DASHBOARD / SAAS === */
         :root {
             --bg-page: #f8fafc;
-            /* Gris muy claro / celeste tenue */
             --bg-card: #ffffff;
-            /* Blanco puro para tarjetas */
 
             --primary: #004e89;
-            /* Primario oscuro */
             --accent-1: #4480af;
-            /* Secundario */
             --accent-2: #2197e5;
-            /* Botones, acentos brillantes */
 
             --text-main: #334155;
-            /* Gris pizarra oscuro */
             --text-muted: #64748b;
-            /* Gris medio */
 
             --color-good: #10b981;
-            /* Verde */
             --color-warn: #f59e0b;
-            /* Amarillo */
             --color-bad: #ef4444;
-            /* Rojo */
 
             --font-sans: 'Inter', sans-serif;
             --font-display: 'Outfit', sans-serif;
@@ -128,7 +118,7 @@
             }
         }
 
-        /* === SEPARADORES DE SECCIÓN NARRATIVOS === */
+        /* === SEPARADORES DE SECCIÓN === */
         .section-wrapper {
             padding: 5rem 0;
         }
@@ -178,19 +168,16 @@
             margin: 0 auto;
         }
 
-        /* === HERO SECTION PROFESIONAL === */
+        /* === HERO SECTION === */
         .hero {
-            /* Gradiente radial profundo */
             background: radial-gradient(circle at 50% 0%, #4480af 0%, #004e89 70%, #003661 100%);
             color: #ffffff;
             padding: 6rem 1.5rem 10rem 1.5rem;
-            /* Padding inferior grande para superposición */
             text-align: center;
             position: relative;
             overflow: hidden;
         }
 
-        /* Patrón sutil de fondo */
         .hero::before {
             content: '';
             position: absolute;
@@ -282,10 +269,8 @@
             }
         }
 
-        /* Tarjetas superpuestas al Hero */
         .overlap-grid {
             margin-top: -6rem;
-            /* Sube hacia el hero */
             position: relative;
             z-index: 10;
         }
@@ -554,7 +539,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
         }
 
-        /* === FOOTER === */
+        /* === FOOTER & BUTTONS === */
         footer {
             background-color: var(--primary);
             color: #ffffff;
@@ -567,6 +552,14 @@
             margin-bottom: 2.5rem;
             opacity: 0.9;
             line-height: 1.8;
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
         }
 
         .btn-download {
@@ -586,6 +579,19 @@
             background-color: #1a7bc0;
             transform: translateY(-3px);
             box-shadow: 0 12px 30px rgba(33, 151, 229, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid #ffffff;
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #ffffff;
+            color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
@@ -623,7 +629,6 @@
     <!-- FASE 1: APERTURA Y TERRENO -->
     <section class="section-wrapper bg-light" style="padding-top: 0;">
         <div class="section-container">
-            <!-- Tarjetas superpuestas al fondo oscuro del hero -->
             <div class="grid grid-3 overlap-grid">
                 <div class="card context-card">
                     <div class="context-icon">🌡️</div>
@@ -658,7 +663,6 @@
             </div>
 
             <div class="tabs-container">
-                <!-- Nav align center -->
                 <div class="tabs-nav">
                     <button class="tab-btn active" data-target="modA">1. Pronóstico 2027</button>
                     <button class="tab-btn" data-target="modB">2. Riesgo Newsvendor</button>
@@ -765,7 +769,7 @@
                                     <p style="margin-bottom: 1rem;"><strong>El costo del Despacho Preferencial:</strong>
                                     </p>
                                     <p>La Ley 27.191 obliga a despachar toda la renovable disponible aunque sea más cara
-                                        (y en Tucumán lo es). </p>
+                                        (y en Tucumán lo es).</p>
                                     <p style="margin-top: 1rem;">Comparando el escenario real contra uno irrestricto, la
                                         diferencia es de 8,68 millones. <strong>Un sobrecosto del 3,63%</strong> para
                                         sostener la matriz verde.</p>
@@ -789,7 +793,6 @@
             </div>
 
             <div class="card">
-                <!-- Controles -->
                 <div class="tabs-nav" style="justify-content: center; margin-bottom: 3rem;">
                     <button class="tab-btn scenario-btn active" data-type="base" onclick="setScenario('base')">Escenario
                         Base</button>
@@ -801,7 +804,6 @@
                         Combinado</button>
                 </div>
 
-                <!-- Grid de KPIs -->
                 <div class="grid grid-4">
                     <div class="kpi-mini-card dash-kpi-card">
                         <div class="dash-kpi-title">Costo Operativo</div>
@@ -824,7 +826,6 @@
                     </div>
                 </div>
 
-                <!-- Banner Alerta -->
                 <div id="alert-banner" class="alert-banner">
                     <strong>¡Efecto No Lineal!</strong> Sumando lo esperado (0 + 41) deberíamos tener 41 GWh. Sin
                     embargo, el déficit salta a 219 GWh (5,3 veces más) y casi 19 días de corte.
@@ -919,7 +920,7 @@
         </div>
     </section>
 
-    <!-- FOOTER -->
+    <!-- FOOTER Y BOTONES DESCARGA -->
     <footer>
         <div class="footer-authors">
             <strong>Autores del Proyecto:</strong><br>
@@ -927,14 +928,19 @@
             Santucho<br>
             UTN Facultad Regional Tucumán - Investigación Operativa (Comisión 4K1)
         </div>
-        <a href="TFI-Bustos-Cedron-Fenino-Gallardo-Santucho-4k1.xlsx" download class="btn-download">
-            Descargar SSD en Microsoft Excel
-        </a>
+
+        <div class="footer-buttons">
+            <a href="AV3-Bustos-Cedron-Fenino-Gallardo-Santucho-4k1.docx" download class="btn-download btn-secondary">
+                📄 Descargar Informe Final (Word)
+            </a>
+            <a href="TFI-Bustos-Cedron-Fenino-Gallardo-Santucho-4k1.xlsx" download class="btn-download">
+                📊 Descargar SSD (Excel)
+            </a>
+        </div>
     </footer>
 
     <!-- LOGICA (JS) -->
     <script>
-        // --- DATA ---
         const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
         const demandData = [313, 281, 275, 212, 226, 243, 257, 229, 218, 248, 271, 307];
         const ssData = [43.73, 45.02, 50.55, 43.05, 42.62, 43.30, 42.43, 42.22, 42.19, 42.76, 44.18, 45.11];
@@ -960,7 +966,6 @@
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.color = '#64748b';
 
-        // --- TABS LOGIC ---
         const tabBtns = document.querySelectorAll('.tabs-nav .tab-btn:not(.scenario-btn)');
         const tabContents = document.querySelectorAll('.tab-content');
 
@@ -973,7 +978,6 @@
             });
         });
 
-        // --- CHART MOD A ---
         const ctxA = document.getElementById('chartModA').getContext('2d');
         const gradientA = ctxA.createLinearGradient(0, 0, 0, 350);
         gradientA.addColorStop(0, 'rgba(33, 151, 229, 0.4)');
@@ -1009,7 +1013,6 @@
             }
         });
 
-        // --- CHART MOD B ---
         const ctxB = document.getElementById('chartModB').getContext('2d');
         new Chart(ctxB, {
             type: 'bar',
@@ -1034,7 +1037,6 @@
             }
         });
 
-        // --- DASHBOARD LOGIC ---
         window.setScenario = function (scenarioKey) {
             document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector(`.scenario-btn[data-type="${scenarioKey}"]`).classList.add('active');
