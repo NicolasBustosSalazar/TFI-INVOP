@@ -40,3 +40,18 @@ El SSD está compuesto por tres modelos secuenciales y un simulador interactivo:
  ┣ 📜 TFI-Bustos-Cedron-Fenino-Gallardo... .xlsx  # Libro de cálculo con los modelos matemáticos y Solver
  ┣ 📜 AV3-Bustos-Cedron-Fenino-Gallardo... .docx  # Documento de investigación formal (Paper)
  ┗ 📜 README.md                                   # Documentación del repositorio
+```
+## 👥 Equipo de Trabajo
+Proyecto desarrollado por alumnos de la comisión 4K1 (2026):
+
+Bustos Salazar, Nicolás José
+
+Cedrón, Sabrina Gabriela
+
+Fenino, Maria Camila
+
+Gallardo, Ana Paula
+
+Santucho, Martin Alexis
+
+Universidad Tecnológica Nacional - Facultad Regional Tucumán
