@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Expediente Tucumán 2027</title>
+    <title>Expediente Tucumán 2027 | Reporte Ejecutivo UTN</title>
 
-    <!-- Google Fonts -->
+    <!-- Tipografías (IBM Plex + Merriweather Sans) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Merriweather+Sans:wght@400;700;800&display=swap"
         rel="stylesheet">
 
     <!-- KaTeX -->
@@ -19,1054 +19,695 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
         onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}]});"></script>
 
+    <!-- Tailwind CSS (Configurado vía CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#003E7E',
+                        background: '#F8FAFC',
+                        surface: '#FFFFFF',
+                        text: '#1E293B',
+                        muted: '#64748B',
+                        accent: '#F47920',
+                    },
+                    fontFamily: {
+                        heading: ['Merriweather Sans', 'sans-serif'],
+                        body: ['IBM Plex Sans', 'sans-serif'],
+                        mono: ['IBM Plex Mono', 'monospace'],
+                    },
+                    borderRadius: {
+                        DEFAULT: '2px',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Alpine.js (Para interactividad del simulador) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* === ESTILO VISUAL DASHBOARD / SAAS === */
-        :root {
-            --bg-page: #f8fafc;
-            --bg-card: #ffffff;
-
-            --primary: #004e89;
-            --accent-1: #4480af;
-            --accent-2: #2197e5;
-
-            --text-main: #334155;
-            --text-muted: #64748b;
-
-            --color-good: #10b981;
-            --color-warn: #f59e0b;
-            --color-bad: #ef4444;
-
-            --font-sans: 'Inter', sans-serif;
-            --font-display: 'Outfit', sans-serif;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: var(--font-sans);
-            background-color: var(--bg-card);
-            color: var(--text-main);
+            background-color: theme('colors.background');
+            color: theme('colors.text');
+            font-family: theme('fontFamily.body');
             line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
         }
 
         h1,
         h2,
         h3,
         h4,
-        .font-display {
-            font-family: var(--font-display);
-            color: var(--primary);
+        h5,
+        h6 {
+            font-family: theme('fontFamily.heading');
+            color: theme('colors.primary');
         }
 
-        /* === NAVBAR INSTITUCIONAL === */
-        .top-nav {
-            background-color: var(--bg-card);
-            padding: 1rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #e2e8f0;
-            position: relative;
-            z-index: 50;
+        .data-mono {
+            font-family: theme('fontFamily.mono');
         }
 
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        /* Estilos Editoriales Strict */
+        .editorial-border {
+            border: 1px solid #E2E8F0;
+            border-radius: 2px;
         }
 
-        .nav-brand h2 {
-            font-size: 1.1rem;
-            margin: 0;
-            line-height: 1.2;
+        .abstract-box {
+            border-left: 4px solid theme('colors.primary');
+            background: theme('colors.background');
         }
 
-        .nav-brand p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin: 0;
+        .highlight-orange {
+            border-top: 4px solid theme('colors.accent');
+            background: #FFF7ED;
         }
 
-        .nav-commission {
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 0.85rem;
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            padding: 0.4rem 1.2rem;
-            border-radius: 50px;
+        /* Scrollbar discreto */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        @media (max-width: 767px) {
-            .top-nav {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
-
-            .nav-brand {
-                flex-direction: column;
-            }
-        }
-
-        /* === SEPARADORES DE SECCIÓN === */
-        .section-wrapper {
-            padding: 5rem 0;
-        }
-
-        .bg-light {
-            background-color: var(--bg-page);
-            border-top: 1px solid #e2e8f0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .section-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 3.5rem;
-        }
-
-        .section-overline {
-            display: inline-block;
-            color: var(--accent-2);
-            font-weight: 700;
-            font-family: var(--font-display);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            margin-bottom: 0.75rem;
-            background: rgba(33, 151, 229, 0.1);
-            padding: 0.3rem 1rem;
-            border-radius: 50px;
-        }
-
-        .section-title {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-            font-weight: 800;
-        }
-
-        .section-subtitle {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        /* === HERO SECTION === */
-        .hero {
-            background: radial-gradient(circle at 50% 0%, #4480af 0%, #004e89 70%, #003661 100%);
-            color: #ffffff;
-            padding: 6rem 1.5rem 10rem 1.5rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-            background-size: 30px 30px;
-            opacity: 0.4;
-            pointer-events: none;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .project-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            padding: 0.6rem 1.8rem;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 2rem;
-            color: #bae6fd;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .hero h1 {
-            color: #ffffff;
-            font-size: clamp(2.5rem, 6vw, 4.2rem);
-            margin-bottom: 1.5rem;
-            line-height: 1.1;
-            font-weight: 900;
-            letter-spacing: -1px;
-            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .hero p.subtitle {
-            font-size: clamp(1.1rem, 2vw, 1.3rem);
-            max-width: 800px;
-            margin: 0 auto;
-            color: #e0f2fe;
-            font-weight: 300;
-            line-height: 1.6;
-        }
-
-        /* === GRID Y TARJETAS === */
-        .card {
-            background-color: var(--bg-card);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-            padding: 2.5rem;
-            border: 1px solid #f1f5f9;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .grid {
-            display: grid;
-            gap: 2rem;
-            grid-template-columns: 1fr;
-        }
-
-        @media (min-width: 768px) {
-            .grid-3 {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .grid-2 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .grid-4 {
-                grid-template-columns: repeat(4, 1fr);
-            }
-
-            .grid-60-40 {
-                grid-template-columns: 1.5fr 1fr;
-            }
-        }
-
-        .overlap-grid {
-            margin-top: -6rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        .context-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-        }
-
-        .context-icon {
-            width: 60px;
-            height: 60px;
-            background: rgba(33, 151, 229, 0.1);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            color: var(--accent-2);
-        }
-
-        .context-card h3 {
-            color: var(--primary);
-            font-size: 1.3rem;
-            margin-bottom: 0.75rem;
-            font-weight: 700;
-        }
-
-        .context-card p {
-            color: var(--text-muted);
-        }
-
-        /* === TABS STYLE === */
-        .tabs-container {
-            margin-bottom: 2rem;
-        }
-
-        .tabs-nav {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 2.5rem;
-            justify-content: center;
-        }
-
-        .tab-btn {
-            background-color: var(--bg-card);
-            color: var(--text-muted);
-            border: 2px solid #e2e8f0;
-            padding: 0.8rem 1.8rem;
-            border-radius: 50px;
-            cursor: pointer;
-            font-family: var(--font-sans);
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-        }
-
-        .tab-btn:hover {
-            border-color: var(--accent-1);
-            color: var(--primary);
-        }
-
-        .tab-btn.active {
-            background-color: var(--accent-2);
-            color: #ffffff;
-            border-color: var(--accent-2);
-            box-shadow: 0 8px 20px rgba(33, 151, 229, 0.25);
-        }
-
-        .tab-content {
-            display: none;
-            animation: slideUp 0.4s ease forwards;
+        ::-webkit-scrollbar-track {
+            background: #F8FAFC;
         }
 
-        .tab-content.active {
-            display: block;
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* === CHARTS & KPI === */
-        .chart-container {
-            position: relative;
-            height: 350px;
-            width: 100%;
-        }
-
-        .kpi-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            justify-content: center;
-        }
-
-        .kpi-mini-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 1.5rem;
-            border-left: 4px solid var(--accent-1);
-        }
-
-        .kpi-mini-card h4 {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-            font-family: var(--font-sans);
-        }
-
-        .kpi-mini-card p {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--primary);
-            font-family: var(--font-display);
-            line-height: 1;
-        }
-
-        /* === TABLA Y MATEMÁTICA === */
-        .math-box {
-            background: #f1f5f9;
-            padding: 2rem;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 1.3rem;
-            overflow-x: auto;
-            margin-bottom: 2.5rem;
-            color: var(--primary);
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 1.2rem;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .data-table th {
-            color: var(--primary);
-            font-weight: 700;
-            background: #f8fafc;
-        }
-
-        .data-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .conclusion-box {
-            background-color: var(--primary);
-            color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            box-shadow: 0 10px 25px rgba(0, 78, 137, 0.2);
-        }
-
-        .conclusion-box p {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            font-weight: 300;
-        }
-
-        .conclusion-box strong {
-            font-weight: 700;
-            color: #bae6fd;
-        }
-
-        /* === DASHBOARD SENSIBILIDAD === */
-        .dash-kpi-card {
-            text-align: center;
-            padding: 2.5rem 1rem;
-            border-left: none;
-            border-top: 4px solid var(--accent-1);
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
         }
 
-        .dash-kpi-title {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 1rem;
-            font-weight: 700;
+        @keyframes soft-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(33, 151, 229, 0); }
+            50% { box-shadow: 0 0 12px 4px rgba(33, 151, 229, 0.3); }
         }
-
-        .dash-kpi-value {
-            font-size: 2.5rem;
-            font-family: var(--font-display);
-            font-weight: 900;
-            transition: color 0.3s ease;
-        }
-
-        .val-good {
-            color: var(--color-good);
-        }
-
-        .val-warn {
-            color: var(--color-warn);
-        }
-
-        .val-bad {
-            color: var(--color-bad);
-        }
-
-        .val-neutral {
-            color: var(--primary);
-        }
-
-        .alert-banner {
-            display: none;
-            background-color: #fef2f2;
-            border: 1px solid #fca5a5;
-            border-left: 6px solid var(--color-bad);
-            color: #991b1b;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-top: 2rem;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
-            animation: slideUp 0.3s ease;
-        }
-
-        /* === CONCLUSIÓN FINAL === */
-        .final-conclusion-card {
-            border: none;
-            box-shadow: none;
-            background: transparent;
-            padding: 0;
-        }
-
-        .final-conclusion-card p {
-            font-size: 1.15rem;
-            color: var(--text-main);
-            margin-bottom: 1.5rem;
+        .animate-glow {
+            animation: soft-glow 1.5s infinite ease-in-out;
         }
 
-        .insight-box {
-            margin-top: 2rem;
-            padding: 2rem;
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-left: 6px solid var(--accent-2);
-            border-radius: 12px;
-            font-size: 1.2rem;
-            color: var(--primary);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-        }
-
-        /* === FOOTER & BUTTONS === */
-        footer {
-            background-color: var(--primary);
-            color: #ffffff;
-            padding: 5rem 1.5rem;
-            text-align: center;
-        }
-
-        .footer-authors {
-            font-size: 1.05rem;
-            margin-bottom: 2.5rem;
-            opacity: 0.9;
-            line-height: 1.8;
-        }
-
-        .footer-buttons {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-
-        .btn-download {
-            display: inline-block;
-            background-color: var(--accent-2);
-            color: #ffffff;
-            padding: 1.2rem 2.5rem;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            text-decoration: none;
-            box-shadow: 0 8px 25px rgba(33, 151, 229, 0.3);
-            transition: all 0.2s ease;
-        }
-
-        .btn-download:hover {
-            background-color: #1a7bc0;
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(33, 151, 229, 0.4);
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            border: 2px solid #ffffff;
-            box-shadow: none;
-        }
-
-        .btn-secondary:hover {
-            background-color: #ffffff;
-            color: var(--primary);
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(255, 255, 255, 0.2);
-        }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
 
-<body>
+<body class="antialiased">
 
-    <!-- NAVBAR INSTITUCIONAL -->
-    <nav class="top-nav">
-        <div class="nav-brand">
-            <svg width="45" height="45" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="45" stroke="var(--primary)" stroke-width="6" />
-                <text x="50" y="58" font-size="28" font-family="Outfit, sans-serif" font-weight="900"
-                    text-anchor="middle" fill="var(--primary)">UTN</text>
-            </svg>
-            <div>
-                <h2>Universidad Tecnológica Nacional</h2>
-                <p>Facultad Regional Tucumán - Ingeniería en Sistemas de Información</p>
+    <!-- HEADER INSTITUCIONAL -->
+    <header class="bg-surface border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" stroke="#003E7E" stroke-width="8" />
+                    <text x="50" y="58" font-size="28" font-family="'Merriweather Sans', sans-serif" font-weight="800"
+                        text-anchor="middle" fill="#003E7E">UTN</text>
+                </svg>
+                <div class="hidden sm:block">
+                    <h2 class="text-sm font-bold leading-tight">Universidad Tecnológica Nacional</h2>
+                    <p class="text-xs text-muted">Facultad Regional Tucumán - Ingeniería en Sistemas</p>
+                </div>
             </div>
-        </div>
-        <div class="nav-commission">
-            Investigación Operativa - Comisión 4K1
-        </div>
-    </nav>
-
-    <!-- HERO SECTION PROFESIONAL -->
-    <header class="hero">
-        <div class="hero-content">
-            <div class="project-badge">El Expediente Tucumán 2027</div>
-            <h1>¿Qué apaga las luces: el Calor o la Red?</h1>
-            <p class="subtitle">Diseño de un Sistema de Soporte a las Decisiones aplicando Modelos Predictivos
-                Climáticos, Gestión de Riesgo por Newsvendor y Programación Lineal.</p>
+            <div class="text-sm font-mono text-primary bg-slate-100 px-3 py-1 editorial-border">
+                Comisión 4K1
+            </div>
         </div>
     </header>
 
-    <!-- FASE 1: APERTURA Y TERRENO -->
-    <section class="section-wrapper bg-light" style="padding-top: 0;">
-        <div class="section-container">
-            <div class="grid grid-3 overlap-grid">
-                <div class="card context-card">
-                    <div class="context-icon">🌡️</div>
-                    <h3>Clima Extremo</h3>
-                    <p>En pleno enero, sin luz y con 38 grados afuera. Los picos críticos de demanda saturan una red que
-                        ya se encuentra en su límite operativo.</p>
-                </div>
-                <div class="card context-card">
-                    <div class="context-icon">⚡</div>
-                    <h3>Cuello de Botella</h3>
-                    <p>La capacidad máxima de transporte del NOA está limitada a <strong>803,16 GWh/mes</strong>. Una
-                        restricción física que representa el nodo más vulnerable.</p>
-                </div>
-                <div class="card context-card">
-                    <div class="context-icon">🌱</div>
-                    <h3>La Matriz Renovable</h3>
-                    <p>Tucumán generó 161 GWh de renovable propia (Hidráulica, Biomasa, Biogás). Se complementan, pero
-                        no alcanzan para cubrir los picos de verano.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- MAIN LAYOUT -->
+    <main class="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row gap-12 items-start">
 
-    <!-- FASE 2: METODOLOGÍA -->
-    <section class="section-wrapper bg-white">
-        <div class="section-container">
-            <div class="section-header">
-                <span class="section-overline">Fase 2: La Metodología</span>
-                <h2 class="section-title">Evidencias y Plan de Compras</h2>
-                <p class="section-subtitle">Reemplazamos la decisión "a ojo" por un sistema de tres módulos integrados
-                    para minimizar costos sin resignar confiabilidad.</p>
-            </div>
+        <!-- SIDEBAR DE NAVEGACIÓN (25%) -->
+        <nav class="hidden md:block w-1/4 sticky top-28 border-r border-gray-200 pr-8">
+            <h4 class="text-xs font-bold text-muted uppercase tracking-wider mb-4">Tabla de Contenidos</h4>
+            <ul class="space-y-3 text-sm font-medium">
+                <li><a href="#abstract"
+                        class="block text-muted hover:text-primary hover:translate-x-1 transition-transform">1. Abstract
+                        & Autores</a></li>
+                <li><a href="#contexto"
+                        class="block text-muted hover:text-primary hover:translate-x-1 transition-transform">2. Contexto
+                        Estructural</a></li>
+                <li><a href="#desarrollo"
+                        class="block text-muted hover:text-primary hover:translate-x-1 transition-transform">3.
+                        Desarrollo Técnico</a></li>
+                <ul class="pl-4 space-y-2 mt-2 border-l border-gray-200">
+                    <li><a href="#modulo-a" class="block text-xs text-muted hover:text-accent">Módulo A: Pronóstico</a>
+                    </li>
+                    <li><a href="#modulo-b" class="block text-xs text-muted hover:text-accent">Módulo B: Newsvendor</a>
+                    </li>
+                    <li><a href="#modulo-c" class="block text-xs text-muted hover:text-accent">Módulo C: Prog.
+                            Lineal</a></li>
+                </ul>
+                <li class="pt-2"><a href="#resultados"
+                        class="block text-muted hover:text-primary hover:translate-x-1 transition-transform">4.
+                        Resultados Críticos</a></li>
+                <li><a href="#fuentes"
+                        class="block text-muted hover:text-primary hover:translate-x-1 transition-transform">5.
+                        Referencias</a></li>
+            </ul>
+        </nav>
 
-            <div class="tabs-container">
-                <div class="tabs-nav">
-                    <button class="tab-btn active" data-target="modA">1. Pronóstico 2027</button>
-                    <button class="tab-btn" data-target="modB">2. Riesgo Newsvendor</button>
-                    <button class="tab-btn" data-target="modC">3. Programación Lineal</button>
+        <!-- COLUMNA DE LECTURA (75%) -->
+        <div class="w-full md:w-3/4 max-w-3xl pb-24 space-y-20">
+
+            <!-- HERO & ABSTRACT -->
+            <section id="abstract" class="scroll-mt-24">
+                <div class="mb-8">
+                    <span class="text-accent text-xs font-mono font-bold tracking-widest uppercase">Reporte Ejecutivo •
+                        Trabajo Final Integrador</span>
+                    <h1 class="text-4xl md:text-5xl font-extrabold mt-3 mb-6 leading-tight">Diseño de un Sistema de
+                        Soporte a las Decisiones en la Red Eléctrica de Tucumán</h1>
+                    <div class="text-sm text-muted editorial-border p-4 bg-surface inline-block">
+                        <strong>Autores:</strong> Cedrón, Sabrina · Fenino, Maria Camila · Gallardo, Ana Paula · Bustos
+                        Salazar, Nicolás José · Santucho, Martin Alexis
+                    </div>
                 </div>
 
-                <!-- MÓDULO A -->
-                <div id="modA" class="tab-content active">
-                    <div class="card">
-                        <div class="grid grid-60-40">
-                            <div>
-                                <div class="chart-container">
-                                    <canvas id="chartModA"></canvas>
-                                </div>
+                <div class="abstract-box p-6 md:p-8">
+                    <h3 class="text-lg font-bold mb-3">Abstract</h3>
+                    <p class="text-text leading-relaxed">Este trabajo desarrolla un Sistema de Soporte a las Decisiones
+                        para la planificación operativa del abastecimiento eléctrico de Tucumán, integrando un modelo de
+                        pronóstico estacional con variable exógena climática para proyectar la demanda mensual de 2027
+                        (MAPE = 3%), un modelo estocástico Newsvendor para dimensionar la reserva térmica de respaldo
+                        óptima, y un modelo de Programación Lineal Multiperíodo que determina la asignación mensual de
+                        energía entre las fuentes renovables locales (hidráulica, biomasa y biogás) y la energía
+                        convencional del Mercado Eléctrico Mayorista.</p>
+                </div>
+            </section>
+
+            <hr class="border-gray-200">
+
+            <!-- CONTEXTO ESTRUCTURAL -->
+            <section id="contexto" class="scroll-mt-24">
+                <h2 class="text-3xl font-bold mb-6">El Terreno: Matriz Renovable y Restricciones</h2>
+                <p class="mb-6 text-lg text-text">La provincia presenta una problemática estructural en su sistema de
+                    distribución eléctrica, caracterizada por picos críticos de demanda estival debido a factores
+                    climáticos externos. Al mismo tiempo, Tucumán enfrenta el desafío de integrar energías renovables
+                    con disponibilidad variable bajo la Ley N.º 27.191.</p>
+
+                <!-- Selector de Imágenes de Energía -->
+                <div x-data="{ currentImg: 'hidro' }" class="mb-8 bg-surface editorial-border overflow-hidden">
+                    <div class="flex border-b border-gray-200">
+                        <button @click="currentImg = 'hidro'" 
+                                :class="currentImg === 'hidro' ? 'bg-primary text-white' : 'bg-transparent text-muted hover:bg-slate-50 animate-glow'"
+                                class="flex-1 py-3 px-4 text-sm font-bold transition-colors">Hidroeléctrica</button>
+                        <button @click="currentImg = 'biomasa'" 
+                                :class="currentImg === 'biomasa' ? 'bg-primary text-white' : 'bg-transparent text-muted hover:bg-slate-50 animate-glow'"
+                                class="flex-1 py-3 px-4 text-sm font-bold border-l border-r border-gray-200 transition-colors">Biomasa</button>
+                        <button @click="currentImg = 'biogas'" 
+                                :class="currentImg === 'biogas' ? 'bg-primary text-white' : 'bg-transparent text-muted hover:bg-slate-50 animate-glow'"
+                                class="flex-1 py-3 px-4 text-sm font-bold transition-colors">Biogás</button>
+                    </div>
+                    <div class="p-6 flex justify-center bg-slate-50 items-center overflow-hidden">
+                        <img x-show="currentImg === 'hidro'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" src="hidro.png" alt="Proceso Hidroeléctrico" class="w-full h-auto object-contain" x-cloak>
+                        <img x-show="currentImg === 'biomasa'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" src="biomasa.png" alt="Proceso Biomasa" class="w-full h-auto object-contain" x-cloak>
+                        <img x-show="currentImg === 'biogas'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" src="biogas.png" alt="Proceso Biogás" class="w-full h-auto object-contain" x-cloak>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DESARROLLO TÉCNICO -->
+            <section id="desarrollo" class="scroll-mt-24 space-y-16">
+                <div>
+                    <h2 class="text-3xl font-bold mb-4">Desarrollo Técnico</h2>
+                    <p class="text-lg text-muted">Reemplazamos las decisiones operativas empíricas por un enfoque basado
+                        en Investigación Operativa de tres módulos secuenciales.</p>
+                </div>
+
+                <!-- Módulo A -->
+                <div id="modulo-a" class="scroll-mt-24" x-data="moduleAData()">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                        <h3 class="text-2xl font-bold flex items-center gap-3">
+                            <span class="bg-primary text-white w-8 h-8 flex items-center justify-center rounded-sm text-sm">A</span>
+                            Pronóstico de Demanda
+                        </h3>
+                        
+                        <!-- Toggle Chart/Table -->
+                        <div class="flex bg-slate-100 p-1 editorial-border rounded-sm">
+                            <button @click="view = 'chart'" :class="view === 'chart' ? 'bg-white shadow-sm text-primary' : 'text-muted animate-glow'" class="px-3 py-1 text-xs font-bold uppercase transition-all rounded-sm">Gráfica</button>
+                            <button @click="view = 'table'" :class="view === 'table' ? 'bg-white shadow-sm text-primary' : 'text-muted animate-glow'" class="px-3 py-1 text-xs font-bold uppercase transition-all rounded-sm">Tabla</button>
+                        </div>
+                    </div>
+
+                    <!-- Dataset Selector -->
+                    <div class="flex gap-2 mb-4 border-b border-gray-200">
+                        <button @click="dataset = 'history'; renderChart()" :class="dataset === 'history' ? 'border-primary text-primary border-b-2' : 'border-transparent text-muted hover:text-primary animate-glow'" class="py-2 px-4 text-sm font-bold transition-all -mb-[1px]">Datos de Entrenamiento (2019-2025)</button>
+                        <button @click="dataset = 'forecast'; renderChart()" :class="dataset === 'forecast' ? 'border-primary text-primary border-b-2' : 'border-transparent text-muted hover:text-primary animate-glow'" class="py-2 px-4 text-sm font-bold transition-all -mb-[1px]">Pronóstico (2027)</button>
+                    </div>
+
+                    <!-- Chart View -->
+                    <div x-show="view === 'chart'" class="flex flex-col md:flex-row gap-6 mb-6 items-center">
+                        <div class="w-full md:w-3/4 bg-surface editorial-border p-4 h-72 relative">
+                            <canvas id="chartModA"></canvas>
+                        </div>
+                        <div class="w-full md:w-1/4 highlight-orange p-6 editorial-border flex flex-col justify-center">
+                            <span class="text-xs font-bold text-muted uppercase">Precisión Validada</span>
+                            <span class="text-4xl font-mono text-accent font-bold mt-1 mb-2">3%</span>
+                            <span class="text-sm font-bold text-primary">MAPE Global</span>
+                            <span class="text-xs text-muted mt-2 border-t border-gray-200 pt-2">Error típico: 13.523 GWh</span>
+                        </div>
+                    </div>
+
+                    <!-- Table View -->
+                    <div x-show="view === 'table'" class="mb-6 bg-surface editorial-border overflow-hidden h-80 flex flex-col" x-cloak>
+                        <div class="overflow-y-auto flex-1 relative">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs text-muted uppercase bg-gray-100 sticky top-0 shadow-sm z-10">
+                                    <tr>
+                                        <th class="px-6 py-3 font-bold border-b border-gray-200 bg-gray-50">Mes / Año</th>
+                                        <th class="px-6 py-3 font-bold border-b border-gray-200 bg-gray-50 text-right">Demanda (GWh)</th>
+                                        <th class="px-6 py-3 font-bold border-b border-gray-200 bg-gray-50 text-right">Temperatura (°C)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(item, index) in (dataset === 'history' ? historicData.dates : forecastData.dates)">
+                                        <tr class="border-b border-gray-100 hover:bg-slate-50 transition-colors">
+                                            <td class="px-6 py-2 font-medium text-text" x-text="item"></td>
+                                            <td class="px-6 py-2 data-mono text-right text-primary" x-text="dataset === 'history' ? historicData.demands[index] : forecastData.demands[index]"></td>
+                                            <td class="px-6 py-2 data-mono text-right text-accent" x-text="dataset === 'history' ? historicData.temps[index] : '-'"></td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <p class="text-sm text-muted">Modelo de regresión ajustado sobre 84 observaciones mensuales (2019-2025). La demanda proyectada inicia en 313 GWh (Enero), cae a 212 (Abril), y repunta a 307 (Diciembre).</p>
+                </div>
+
+                <!-- Módulo B -->
+                <div id="modulo-b" class="scroll-mt-24" x-data="{ view: 'chart' }">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                        <h3 class="text-2xl font-bold flex items-center gap-3">
+                            <span class="bg-primary text-white w-8 h-8 flex items-center justify-center rounded-sm text-sm">B</span>
+                            Gestión de Riesgo (Newsvendor)
+                        </h3>
+                        <!-- Toggle Chart/Table -->
+                        <div class="flex bg-slate-100 p-1 editorial-border rounded-sm">
+                            <button @click="view = 'chart'" :class="view === 'chart' ? 'bg-white shadow-sm text-primary' : 'text-muted animate-glow'" class="px-3 py-1 text-xs font-bold uppercase transition-all rounded-sm">Análisis</button>
+                            <button @click="view = 'table'" :class="view === 'table' ? 'bg-white shadow-sm text-primary' : 'text-muted animate-glow'" class="px-3 py-1 text-xs font-bold uppercase transition-all rounded-sm">Tabla</button>
+                        </div>
+                    </div>
+                    
+                    <p class="mb-4">El modelo estocástico balancea el riesgo de desabastecimiento. La asimetría entre el costo de quedarse corto frente al de tener exceso dictamina el stock de seguridad.</p>
+
+                    <!-- Analysis View -->
+                    <div x-show="view === 'chart'">
+                        <div class="bg-surface editorial-border p-0 overflow-hidden mb-6 flex flex-col sm:flex-row">
+                            <div class="p-6 border-b sm:border-b-0 sm:border-r border-gray-200 flex-1">
+                                <span class="block text-xs text-muted uppercase font-bold mb-1">Costo No Suministrada (CENS)</span>
+                                <span class="block text-2xl data-mono font-bold text-primary">1.500.000 USD/GWh</span>
                             </div>
-                            <div class="kpi-wrapper">
-                                <div class="kpi-mini-card">
-                                    <h4>Error Porcentual Absoluto Medio</h4>
-                                    <p>MAPE = 3%</p>
-                                </div>
-                                <div class="kpi-mini-card">
-                                    <h4>Comportamiento</h4>
-                                    <p style="font-size: 1.2rem; font-weight: 500; font-family: var(--font-sans);">
-                                        Ajuste sobre 84 observaciones. La demanda inicia en 313 GWh (Enero), cae a 212
-                                        (Abril) y repunta a 307 (Diciembre).</p>
-                                </div>
+                            <div class="p-6 border-b sm:border-b-0 sm:border-r border-gray-200 flex-1">
+                                <span class="block text-xs text-muted uppercase font-bold mb-1">Costo Reserva Ociosa (Cres)</span>
+                                <span class="block text-2xl data-mono font-bold text-primary">1.388,89 USD/GWh</span>
+                            </div>
+                            <div class="p-6 flex-1 bg-slate-50">
+                                <span class="block text-xs text-muted uppercase font-bold mb-1">Factor Óptimo (Zt)</span>
+                                <span class="block text-3xl data-mono font-bold text-accent">3,10</span>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Table View -->
+                    <div x-show="view === 'table'" class="mb-6 bg-surface editorial-border overflow-hidden flex flex-col" x-cloak>
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-muted uppercase bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 font-bold border-b border-gray-200">Mes (2027)</th>
+                                    <th class="px-6 py-3 font-bold border-b border-gray-200 text-right">Desvío Est. (σ)</th>
+                                    <th class="px-6 py-3 font-bold border-b border-gray-200 text-right">Stock de Seguridad (SSt)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="(month, idx) in ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']">
+                                    <tr class="border-b border-gray-100 hover:bg-slate-50 transition-colors">
+                                        <td class="px-6 py-2 font-medium text-text" x-text="month"></td>
+                                        <td class="px-6 py-2 data-mono text-right text-muted">14,2</td>
+                                        <td class="px-6 py-2 data-mono text-right text-primary font-bold" x-text="(14.2 * 3.10).toFixed(2) + ' GWh'"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p class="text-sm text-muted">La reserva térmica óptima contratada requerida fluctúa entre 42 y 51 GWh mensuales para cubrir la incertidumbre histórica y proyectada.</p>
                 </div>
 
-                <!-- MÓDULO B -->
-                <div id="modB" class="tab-content">
-                    <div class="card">
-                        <div class="grid grid-60-40">
-                            <div>
-                                <div class="chart-container">
-                                    <canvas id="chartModB"></canvas>
-                                </div>
-                            </div>
-                            <div class="kpi-wrapper">
-                                <div class="kpi-mini-card">
-                                    <h4>Costo de Quedarse Corto (CENS)</h4>
-                                    <p>1.500.000 USD<span
-                                            style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">/GWh</span>
-                                    </p>
-                                </div>
-                                <div class="kpi-mini-card">
-                                    <h4>Costo de Reserva de más</h4>
-                                    <p>1.389 USD<span
-                                            style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">/GWh</span>
-                                    </p>
-                                </div>
-                                <div class="kpi-mini-card">
-                                    <h4>Resultado Óptimo</h4>
-                                    <p style="font-size: 1.2rem; font-weight: 500; font-family: var(--font-sans);">El
-                                        factor Z se mantiene en 3,10. La reserva necesaria varía entre 42 y 51 GWh
-                                        mensuales.</p>
-                                </div>
-                            </div>
+                <!-- Módulo C -->
+                <div id="modulo-c" class="scroll-mt-24" x-data="{ view: 'chart' }">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                        <h3 class="text-2xl font-bold flex items-center gap-3">
+                            <span class="bg-primary text-white w-8 h-8 flex items-center justify-center rounded-sm text-sm">C</span>
+                            Programación Lineal Multiperíodo
+                        </h3>
+                        <!-- Toggle Chart/Table -->
+                        <div class="flex bg-slate-100 p-1 editorial-border rounded-sm">
+                            <button @click="view = 'chart'" :class="view === 'chart' ? 'bg-white shadow-sm text-primary' : 'text-muted animate-glow'" class="px-3 py-1 text-xs font-bold uppercase transition-all rounded-sm">Fórmula</button>
+                            <button @click="view = 'table'" :class="view === 'table' ? 'bg-white shadow-sm text-primary' : 'text-muted animate-glow'" class="px-3 py-1 text-xs font-bold uppercase transition-all rounded-sm">Parámetros</button>
                         </div>
                     </div>
-                </div>
+                    
+                    <p class="mb-4">Determina la combinación mensual óptima de compra minimizando el costo operativo total, sujeto a la restricción física de transporte y la obligación del despacho preferencial renovable.</p>
 
-                <!-- MÓDULO C -->
-                <div id="modC" class="tab-content">
-                    <div class="card">
-                        <div class="math-box">
-                            $$ \min Z = \sum_{t=1}^{12} \left[ \sum_{j} (C_j \cdot X_{j,t}) + C_{mem,t} \cdot Y_t +
-                            C_{res} \cdot R_t + CENS \cdot ENS_t \right] $$
-                        </div>
-
-                        <div class="grid grid-2">
-                            <div>
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Fuente de Energía</th>
-                                            <th>Costo Unitario</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Hidráulica local</td>
-                                            <td>101.930 USD/GWh</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Biomasa local</td>
-                                            <td>124.370 USD/GWh</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Biogás local</td>
-                                            <td>159.420 USD/GWh</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Mercado (MEM)</td>
-                                            <td>56.630 - 97.070 USD/GWh</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div>
-                                <div class="conclusion-box">
-                                    <p style="margin-bottom: 1rem;"><strong>El costo del Despacho Preferencial:</strong>
-                                    </p>
-                                    <p>La Ley 27.191 obliga a despachar toda la renovable disponible aunque sea más cara
-                                        (y en Tucumán lo es).</p>
-                                    <p style="margin-top: 1rem;">Comparando el escenario real contra uno irrestricto, la
-                                        diferencia es de 8,68 millones. <strong>Un sobrecosto del 3,63%</strong> para
-                                        sostener la matriz verde.</p>
-                                </div>
-                            </div>
+                    <!-- Analysis View -->
+                    <div x-show="view === 'chart'">
+                        <!-- FÓRMULA RENDERIZADA CON KATEX -->
+                        <div class="bg-surface p-6 editorial-border text-center overflow-x-auto mb-6">
+                            $$ \min Z = \sum_{t=1}^{12} \left[ \sum_{j} (C_j \cdot X_{j,t}) + C_{mem,t} \cdot Y_t + C_{res} \cdot R_t + CENS \cdot ENS_t \right] $$
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- FASE 3: EL GIRO (DASHBOARD) -->
-    <section class="section-wrapper bg-light">
-        <div class="section-container">
-            <div class="section-header">
-                <span class="section-overline">Fase 3: El Giro</span>
-                <h2 class="section-title">Estresando el Sistema</h2>
-                <p class="section-subtitle">¿Qué sucede cuando ponemos a prueba el modelo? Simulador interactivo
-                    evaluando picos térmicos y contingencias en la red.</p>
-            </div>
-
-            <div class="card">
-                <div class="tabs-nav" style="justify-content: center; margin-bottom: 3rem;">
-                    <button class="tab-btn scenario-btn active" data-type="base" onclick="setScenario('base')">Escenario
-                        Base</button>
-                    <button class="tab-btn scenario-btn" data-type="heat" onclick="setScenario('heat')">+10%
-                        Temperatura</button>
-                    <button class="tab-btn scenario-btn" data-type="fail" onclick="setScenario('fail')">Línea
-                        Restringida (300GWh)</button>
-                    <button class="tab-btn scenario-btn" data-type="comb" onclick="setScenario('comb')">Efecto
-                        Combinado</button>
-                </div>
-
-                <div class="grid grid-4">
-                    <div class="kpi-mini-card dash-kpi-card">
-                        <div class="dash-kpi-title">Costo Operativo</div>
-                        <div class="dash-kpi-value val-neutral" id="dash-cost">-</div>
+                    <!-- Table View -->
+                    <div x-show="view === 'table'" class="mb-6 bg-surface editorial-border overflow-hidden flex flex-col" x-cloak>
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-muted uppercase bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 font-bold border-b border-gray-200">Fuente Renovable / Convencional</th>
+                                    <th class="px-6 py-3 font-bold border-b border-gray-200 text-right">Costo Variable Promedio (USD/GWh)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100 hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-2 font-medium text-text">Mercado Eléctrico Mayorista (MEM)</td>
+                                    <td class="px-6 py-2 data-mono text-right text-primary">56.630 – 97.070</td>
+                                </tr>
+                                <tr class="border-b border-gray-100 hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-2 font-medium text-text">Generación Hidráulica Local</td>
+                                    <td class="px-6 py-2 data-mono text-right text-primary">101.930</td>
+                                </tr>
+                                <tr class="border-b border-gray-100 hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-2 font-medium text-text">Generación por Biomasa</td>
+                                    <td class="px-6 py-2 data-mono text-right text-primary">124.370</td>
+                                </tr>
+                                <tr class="border-b border-gray-100 hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-2 font-medium text-text">Generación por Biogás</td>
+                                    <td class="px-6 py-2 data-mono text-right text-primary">159.420</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
-                    <div class="kpi-mini-card dash-kpi-card">
-                        <div class="dash-kpi-title">Déficit (ENS)</div>
-                        <div class="dash-kpi-value" id="dash-ens">-</div>
-                    </div>
-
-                    <div class="kpi-mini-card dash-kpi-card">
-                        <div class="dash-kpi-title">Impacto Tarifa</div>
-                        <div class="dash-kpi-value" id="dash-var">-</div>
-                    </div>
-
-                    <div class="kpi-mini-card dash-kpi-card">
-                        <div class="dash-kpi-title">Horas de Corte</div>
-                        <div class="dash-kpi-value" id="dash-hours">-</div>
+                    <div class="bg-blue-50 editorial-border border-l-4 border-l-primary p-6">
+                        <h4 class="font-bold text-primary mb-2">Impacto del Despacho Preferencial (Ley N° 27.191)</h4>
+                        <p class="text-sm text-text">Al forzar la compra de renovables locales, cuyo costo (Hidráulica, Biomasa, Biogás) supera al del Mercado Convencional (MEM), se incurre en un sobrecosto anual cuantificado del <strong class="data-mono text-primary bg-white px-1">+3,63%</strong>. Es el costo financiero de sostener la matriz verde.</p>
                     </div>
                 </div>
+            </section>
 
-                <div id="alert-banner" class="alert-banner">
-                    <strong>¡Efecto No Lineal!</strong> Sumando lo esperado (0 + 41) deberíamos tener 41 GWh. Sin
-                    embargo, el déficit salta a 219 GWh (5,3 veces más) y casi 19 días de corte.
-                </div>
-            </div>
-        </div>
-    </section>
+            <hr class="border-gray-200">
 
-    <!-- FASE 4: VEREDICTO -->
-    <section class="section-wrapper bg-white">
-        <div class="section-container">
-            <div class="section-header" style="margin-bottom: 2rem;">
-                <span class="section-overline">Fase 4: El Veredicto</span>
-                <h2 class="section-title">Cierre del Expediente</h2>
-            </div>
+            <!-- RESULTADOS Y CONCLUSIONES (SIMULADOR ALPINE) -->
+            <section id="resultados" class="scroll-mt-24" x-data="simulator()">
+                <h2 class="text-3xl font-bold mb-2">Resultados: El Giro Crítico</h2>
+                <p class="text-lg text-muted mb-8">Análisis de Sensibilidad: ¿Qué apaga las luces en Tucumán?</p>
 
-            <div class="grid grid-1" style="max-width: 900px; margin: 0 auto;">
-                <div class="final-conclusion-card">
-                    <p>Cerramos los cuatro objetivos: logramos un pronóstico con apenas 3% de error, calculamos la
-                        reserva óptima para cubrir la incertidumbre (entre 42 y 51 GWh mensuales), y cuantificamos el
-                        costo de sostener la política de renovables locales en un 3,63% anual.</p>
+                <!-- Simulador de Escenarios -->
+                <div class="bg-surface editorial-border p-6 shadow-sm">
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        <template x-for="mode in ['base', 'heat', 'transport', 'combined']">
+                            <button @click="scenario = mode"
+                                :class="scenario === mode ? 'bg-primary text-white border-primary' : 'bg-transparent text-muted border-gray-300 hover:border-primary hover:text-primary animate-glow'"
+                                class="px-4 py-2 border rounded-sm text-sm font-bold transition-colors uppercase tracking-wide"
+                                x-text="getLabel(mode)">
+                            </button>
+                        </template>
+                    </div>
 
-                    <div class="insight-box">
-                        <strong>El riesgo real no está en el cielo, está en los cables.</strong><br><br>
-                        <span style="font-size: 1.1rem; color: var(--text-main); font-weight: 400; line-height: 1.6;">
-                            El calor extremo por sí solo no rompe el sistema porque la red tiene margen. El desastre
-                            ocurre cuando ese margen ya está comprometido por una restricción de transporte. Ahí,
-                            cualquier grado extra golpea con un multiplicador de 5.3x. La vulnerabilidad estructural de
-                            Tucumán reside en su infraestructura de transporte, no en el clima.
-                        </span>
+                    <!-- Métricas Data Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="p-4 bg-slate-50 border border-gray-100">
+                            <span class="block text-xs text-muted uppercase font-bold mb-1">Costo Anual</span>
+                            <span class="block text-xl data-mono font-bold text-primary"
+                                x-text="data[scenario].cost"></span>
+                        </div>
+                        <div class="p-4 bg-slate-50 border border-gray-100"
+                            :class="data[scenario].alert ? 'bg-red-50 border-red-100' : ''">
+                            <span class="block text-xs text-muted uppercase font-bold mb-1">Déficit Físico (ENS)</span>
+                            <span class="block text-xl data-mono font-bold text-primary"
+                                :class="data[scenario].alert ? 'text-red-600' : ''" x-text="data[scenario].ens"></span>
+                        </div>
+                        <div class="p-4 bg-slate-50 border border-gray-100">
+                            <span class="block text-xs text-muted uppercase font-bold mb-1">Variación Tarifa</span>
+                            <span class="block text-xl data-mono font-bold text-primary"
+                                :class="data[scenario].alert ? 'text-accent' : ''" x-text="data[scenario].var"></span>
+                        </div>
+                        <div class="p-4 bg-slate-50 border border-gray-100"
+                            :class="data[scenario].alert ? 'bg-red-50 border-red-100' : ''">
+                            <span class="block text-xs text-muted uppercase font-bold mb-1">Horas de Corte</span>
+                            <span class="block text-xl data-mono font-bold text-primary"
+                                :class="data[scenario].alert ? 'text-red-600' : ''"
+                                x-text="data[scenario].hours"></span>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje Crítico Dinámico -->
+                    <div x-show="data[scenario].critical" x-transition.duration.300ms class="highlight-orange p-6 mt-4">
+                        <h4 class="font-bold text-accent mb-2 uppercase tracking-wide text-sm">Comportamiento No Lineal
+                        </h4>
+                        <p class="text-sm font-medium text-text">La suma esperada (0 GWh por clima + 41 GWh por red)
+                            debería ser 41 GWh. Sin embargo, el déficit resultante salta a <strong class="data-mono">219
+                                GWh</strong> (5,3 veces más). El verdadero riesgo para Tucumán no es el clima extremo
+                            per se, sino el margen nulo de su infraestructura de transporte que colapsa ante cualquier
+                            estrés adicional.</p>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
+            </section>
 
-    <!-- FUENTES Y REFERENCIAS -->
-    <section class="section-wrapper bg-light">
-        <div class="section-container">
-            <div class="section-header" style="margin-bottom: 2rem; text-align: left;">
-                <h2 class="section-title" style="font-size: 1.8rem;">Fuentes y Referencias Documentales</h2>
-            </div>
+            <hr class="border-gray-200">
 
-            <div class="card" style="padding: 2rem;">
-                <ul style="list-style: none; font-size: 0.95rem; color: var(--text-muted); line-height: 1.8;">
-                    <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; text-indent: -1.5rem;">
-                        <strong>[1]</strong> Estación Experimental Agroindustrial Obispo Colombres (EEAOC),
-                        «Caracterización energética de bagazo de caña de azúcar en Tucumán, Argentina». <a
+            <!-- FUENTES -->
+            <section id="fuentes" class="scroll-mt-24">
+                <h2 class="text-2xl font-bold mb-6">Referencias Documentales</h2>
+                <ul class="space-y-4 text-sm text-muted">
+                    <li class="pl-6 relative">
+                        <span class="absolute left-0 font-bold text-primary">[1]</span>
+                        Estación Experimental Agroindustrial Obispo Colombres (EEAOC), «Caracterización energética de
+                        bagazo de caña de azúcar en Tucumán». <a
                             href="https://publicaciones.eeaoc.gob.ar/index.php/riat/article/view/11" target="_blank"
-                            style="color: var(--accent-2); text-decoration: none; font-weight: 500;">[Ver
-                            publicación]</a>
+                            class="text-accent hover:underline font-medium">Ver fuente &rarr;</a>
                     </li>
-                    <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; text-indent: -1.5rem;">
-                        <strong>[2]</strong> Ley N.° 27.191, Régimen de Fomento Nacional para el uso de Fuentes
-                        Renovables de Energía destinada a la Producción de Energía Eléctrica, 2015. <a
+                    <li class="pl-6 relative">
+                        <span class="absolute left-0 font-bold text-primary">[2]</span>
+                        Ley N.° 27.191, Régimen de Fomento Nacional para el uso de Fuentes Renovables de Energía. <a
                             href="https://www.argentina.gob.ar/normativa/nacional/ley-27191-253626" target="_blank"
-                            style="color: var(--accent-2); text-decoration: none; font-weight: 500;">[Ver Ley]</a>
+                            class="text-accent hover:underline font-medium">Ver fuente &rarr;</a>
                     </li>
-                    <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; text-indent: -1.5rem;">
-                        <strong>[3]</strong> APPA Renovables, «¿Qué es el biogás?». <a
-                            href="https://www.apparenovables.es/" target="_blank"
-                            style="color: var(--accent-2); text-decoration: none; font-weight: 500;">[Ver sitio]</a>
+                    <li class="pl-6 relative">
+                        <span class="absolute left-0 font-bold text-primary">[3]</span>
+                        APPA Renovables, «¿Qué es el biogás?». <a href="https://www.apparenovables.es/" target="_blank"
+                            class="text-accent hover:underline font-medium">Ver fuente &rarr;</a>
                     </li>
-                    <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; text-indent: -1.5rem;">
-                        <strong>[4]</strong> CAMMESA, Base de datos de Energías Renovables, Precios Mensuales e
-                        Históricos de Generación y Reglas de Mercado. <a href="https://cammesaweb.cammesa.com/"
-                            target="_blank"
-                            style="color: var(--accent-2); text-decoration: none; font-weight: 500;">[Sitio
-                            institucional]</a>
+                    <li class="pl-6 relative">
+                        <span class="absolute left-0 font-bold text-primary">[4]</span>
+                        CAMMESA, Base de datos de Energías Renovables y Precios Mensuales (MEM / MATER). <a
+                            href="https://cammesaweb.cammesa.com/" target="_blank"
+                            class="text-accent hover:underline font-medium">Ver fuente &rarr;</a>
                     </li>
-                    <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; text-indent: -1.5rem;">
-                        <strong>[5]</strong> Ente Regulador de los Servicios Eléctricos de Tucumán [ERSEPT],
-                        «Repotenciación energética: la línea El Bracho–Cevil Pozo cuenta con un 20% más de potencia». <a
-                            href="https://ersept.gob.ar/repotenciacion-energetica-la-linea-el-bracho-cevil-pozo-cuenta-con-un-20-mas-de-potencia/"
-                            target="_blank"
-                            style="color: var(--accent-2); text-decoration: none; font-weight: 500;">[Ver nota]</a>
+                    <li class="pl-6 relative">
+                        <span class="absolute left-0 font-bold text-primary">[5]</span>
+                        Ente Regulador de los Servicios Eléctricos de Tucumán [ERSEPT], Restricciones de red El Bracho.
+                        <a href="https://ersept.gob.ar/repotenciacion-energetica-la-linea-el-bracho-cevil-pozo-cuenta-con-un-20-mas-de-potencia/"
+                            target="_blank" class="text-accent hover:underline font-medium">Ver fuente &rarr;</a>
                     </li>
-                    <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; text-indent: -1.5rem;">
-                        <strong>[6]</strong> Secretaría de Energía, Resolución N.° 137/1992 (Parámetros para el cálculo
-                        de CENS y Costo de Reserva). <a
+                    <li class="pl-6 relative">
+                        <span class="absolute left-0 font-bold text-primary">[6]</span>
+                        Secretaría de Energía, Resolución N.° 137/1992. Valores regulados CENS. <a
                             href="https://www.argentina.gob.ar/normativa/nacional/resoluci%C3%B3n-137-1992-74669/texto"
-                            target="_blank"
-                            style="color: var(--accent-2); text-decoration: none; font-weight: 500;">[Ver
-                            resolución]</a>
-                    </li>
-                    <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; text-indent: -1.5rem;">
-                        <strong>[7]</strong> Bibliografía Base: Investigación de Operaciones (Taha, 1996; Hillier &
-                        Lieberman, 2010; Anderson et al., 2011).
+                            target="_blank" class="text-accent hover:underline font-medium">Ver fuente &rarr;</a>
                     </li>
                 </ul>
+            </section>
+        </div>
+    </main>
+
+    <!-- FOOTER & CALL TO ACTION -->
+    <footer class="bg-primary text-white py-16">
+        <div class="max-w-7xl mx-auto px-6 text-center flex flex-col items-center">
+            <h3 class="text-2xl font-heading font-bold mb-8">Descargar Archivos del Expediente</h3>
+
+            <div class="flex flex-col sm:flex-row gap-4 mb-12">
+                <a href="AV3-Bustos-Cedron-Fenino-Gallardo-Santucho-4k1.docx" download
+                    class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-sm font-bold hover:bg-white hover:text-primary transition-colors flex items-center gap-2">
+                    📄 Documento Final (Word)
+                </a>
+                <a href="TFI-Bustos-Cedron-Fenino-Gallardo-Santucho-4k1.xlsx" download
+                    class="bg-accent text-white border-2 border-accent px-8 py-3 rounded-sm font-bold hover:bg-orange-600 hover:border-orange-600 transition-colors flex items-center gap-2 shadow-lg">
+                    📊 Modelo Computacional (Excel)
+                </a>
             </div>
-        </div>
-    </section>
 
-    <!-- FOOTER Y BOTONES DESCARGA -->
-    <footer>
-        <div class="footer-authors">
-            <strong>Autores del Proyecto:</strong><br>
-            Sabrina Cedrón - Nicolás José Bustos Salazar - Ana Paula Gallardo - Maria Camila Fenino - Martin Alexis
-            Santucho<br>
-            UTN Facultad Regional Tucumán - Investigación Operativa (Comisión 4K1)
-        </div>
-
-        <div class="footer-buttons">
-            <a href="AV3-Bustos-Cedron-Fenino-Gallardo-Santucho-4k1.docx" download class="btn-download btn-secondary">
-                📄 Descargar Informe Final (Word)
-            </a>
-            <a href="TFI-Bustos-Cedron-Fenino-Gallardo-Santucho-4k1.xlsx" download class="btn-download">
-                📊 Descargar SSD (Excel)
-            </a>
+            <div class="text-sm opacity-80 border-t border-white/20 pt-8 w-full max-w-2xl mx-auto">
+                <p class="font-bold mb-2">Universidad Tecnológica Nacional – Facultad Regional Tucumán</p>
+                <p>Investigación Operativa (2026) - Comisión 4K1</p>
+                <p class="mt-4">Autores: Cedrón, S. · Fenino, M.C. · Gallardo, A.P. · Bustos Salazar, N.J. · Santucho,
+                    M.A.</p>
+            </div>
         </div>
     </footer>
 
-    <!-- LOGICA (JS) -->
+    <!-- SCRIPTS LÓGICA -->
     <script>
-        const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-        const demandData = [313, 281, 275, 212, 226, 243, 257, 229, 218, 248, 271, 307];
-        const ssData = [43.73, 45.02, 50.55, 43.05, 42.62, 43.30, 42.43, 42.22, 42.19, 42.76, 44.18, 45.11];
-
-        const scenarios = {
-            'base': { cost: "$247M", ens: "0 GWh", var: "Base", hours: "0 hs", colorClass: 'val-good' },
-            'heat': { cost: "$262M", ens: "0 GWh", var: "+6.1%", hours: "0 hs", colorClass: 'val-good' },
-            'fail': { cost: "$306M", ens: "41 GWh", var: "+23.7%", hours: "95 hs", colorClass: 'val-warn' },
-            'comb': { cost: "$575M", ens: "219 GWh", var: "+132.7%", hours: "448 hs", colorClass: 'val-bad' }
-        };
-
-        const customTooltip = {
-            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-            titleColor: '#ffffff',
-            bodyColor: '#e2e8f0',
-            padding: 12,
-            cornerRadius: 8,
-            displayColors: false,
-            titleFont: { size: 14, family: "'Outfit', sans-serif" },
-            bodyFont: { size: 13, family: "'Inter', sans-serif" }
-        };
-
-        Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.color = '#64748b';
-
-        const tabBtns = document.querySelectorAll('.tabs-nav .tab-btn:not(.scenario-btn)');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                tabBtns.forEach(b => b.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById(btn.dataset.target).classList.add('active');
-            });
-        });
-
-        const ctxA = document.getElementById('chartModA').getContext('2d');
-        const gradientA = ctxA.createLinearGradient(0, 0, 0, 350);
-        gradientA.addColorStop(0, 'rgba(33, 151, 229, 0.4)');
-        gradientA.addColorStop(1, 'rgba(33, 151, 229, 0)');
-
-        new Chart(ctxA, {
-            type: 'line',
-            data: {
-                labels: months,
-                datasets: [{
-                    label: 'Demanda (GWh)',
-                    data: demandData,
-                    borderColor: '#2197e5',
-                    backgroundColor: gradientA,
-                    borderWidth: 3,
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#2197e5',
-                    pointBorderWidth: 2,
-                    pointRadius: 5,
-                    pointHoverRadius: 7
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip: customTooltip },
-                scales: {
-                    x: { grid: { display: false } },
-                    y: { grid: { color: 'rgba(0,0,0,0.04)' } }
+        // --- 1. LÓGICA ALPINE.JS (SIMULADOR DE ESCENARIOS) ---
+        function simulator() {
+            return {
+                scenario: 'base',
+                data: {
+                    base: { cost: '$ 247.438.005', ens: '0 GWh', var: 'Base', hours: '0 hs', alert: false, critical: false },
+                    heat: { cost: '$ 262.448.098', ens: '0 GWh', var: '-0.8%', hours: '0 hs', alert: false, critical: false },
+                    transport: { cost: '$ 306.160.103', ens: '41.0 GWh', var: '+25.4%', hours: '95.1 hs', alert: true, critical: false },
+                    combined: { cost: '$ 575.722.056', ens: '219.0 GWh', var: '+133.1%', hours: '448.2 hs', alert: true, critical: true }
+                },
+                getLabel(mode) {
+                    const labels = { base: 'Base', heat: 'Calor (+10%)', transport: 'Red (300 GWh)', combined: 'Combinado' };
+                    return labels[mode];
                 }
             }
-        });
+        }
 
-        const ctxB = document.getElementById('chartModB').getContext('2d');
-        new Chart(ctxB, {
-            type: 'bar',
-            data: {
-                labels: months,
-                datasets: [{
-                    label: 'Stock de Seguridad (GWh)',
-                    data: ssData,
-                    backgroundColor: '#4480af',
-                    borderRadius: 6,
-                    hoverBackgroundColor: '#004e89'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip: customTooltip },
-                scales: {
-                    x: { grid: { display: false } },
-                    y: { grid: { color: 'rgba(0,0,0,0.04)' } }
+        // --- 2. GRÁFICOS (CHART.JS) Y MÓDULO A ---
+        Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+        Chart.defaults.color = '#64748B';
+
+        function moduleAData() {
+            return {
+                view: 'chart',
+                dataset: 'history', // 'history' | 'forecast'
+                chartInstance: null,
+                historicData: {
+                  "dates": ["Jan-19", "Feb-19", "Mar-19", "Apr-19", "May-19", "Jun-19", "Jul-19", "Aug-19", "Sep-19", "Oct-19", "Nov-19", "Dec-19", "Jan-20", "Feb-20", "Mar-20", "Apr-20", "May-20", "Jun-20", "Jul-20", "Aug-20", "Sep-20", "Oct-20", "Nov-20", "Dec-20", "Jan-21", "Feb-21", "Mar-21", "Apr-21", "May-21", "Jun-21", "Jul-21", "Aug-21", "Sep-21", "Oct-21", "Nov-21", "Dec-21", "Jan-22", "Feb-22", "Mar-22", "Apr-22", "May-22", "Jun-22", "Jul-22", "Aug-22", "Sep-22", "Oct-22", "Nov-22", "Dec-22", "Jan-23", "Feb-23", "Mar-23", "Apr-23", "May-23", "Jun-23", "Jul-23", "Aug-23", "Sep-23", "Oct-23", "Nov-23", "Dec-23", "Jan-24", "Feb-24", "Mar-24", "Apr-24", "May-24", "Jun-24", "Jul-24", "Aug-24", "Sep-24", "Oct-24", "Nov-24", "Dec-24", "Jan-25", "Feb-25", "Mar-25", "Apr-25", "May-25", "Jun-25", "Jul-25", "Aug-25", "Sep-25", "Oct-25", "Nov-25", "Dec-25"],
+                  "demands": [261.36, 241.24, 207.37, 189.23, 199.29, 203.55, 220.64, 204.59, 192.14, 227.14, 248.91, 271.93, 285.09, 232.23, 265.17, 184.11, 188.35, 205.22, 233.79, 199.99, 194.21, 224.49, 244.96, 279.84, 261.85, 211.49, 223.69, 194.39, 198.08, 232.77, 227.66, 210.21, 193.99, 234.73, 231.8, 288.91, 317.12, 234.96, 220.59, 192.5, 213.56, 252.91, 233.81, 210.66, 190.44, 213.23, 271.68, 304.97, 314.46, 276.31, 345.2, 199.79, 202.94, 225.29, 238.37, 207.99, 205.21, 225.92, 267.3, 284.05, 303.57, 302.39, 307.87, 205.97, 251.95, 224.89, 272.49, 222.98, 205.33, 246.51, 245.85, 291.49, 314.5, 348.59, 252.36, 192.04, 211.53, 241.7, 247.78, 217.54, 213.9, 238.93, 257.05, 302.49],
+                  "temps": [25.0, 24.1, 21.2, 19.7, 16.0, 14.6, 11.7, 12.4, 15.4, 17.5, 22.7, 23.7, 25.1, 25.5, 24.4, 18.0, 15.7, 13.0, 10.9, 13.1, 14.6, 17.2, 21.9, 23.5, 25.5, 23.6, 22.2, 20.7, 14.3, 11.9, 12.2, 13.2, 16.0, 18.8, 21.6, 25.0, 26.2, 23.2, 20.8, 18.0, 13.8, 10.8, 12.6, 13.7, 15.8, 18.1, 23.0, 25.0, 26.9, 25.6, 27.1, 19.1, 16.4, 13.2, 13.0, 14.2, 15.0, 18.2, 21.2, 22.9, 25.8, 26.3, 23.3, 18.7, 12.7, 14.6, 10.6, 12.7, 17.1, 20.5, 22.4, 22.6, 26.3, 26.1, 23.4, 18.4, 16.7, 11.2, 12.3, 13.9, 15.6, 19.5, 20.6, 25.9]
+                },
+                forecastData: {
+                    dates: ['Ene-27', 'Feb-27', 'Mar-27', 'Abr-27', 'May-27', 'Jun-27', 'Jul-27', 'Ago-27', 'Sep-27', 'Oct-27', 'Nov-27', 'Dic-27'],
+                    demands: [313, 281, 275, 212, 226, 243, 257, 229, 218, 248, 271, 307]
+                },
+                init() {
+                    this.$watch('view', value => {
+                        if (value === 'chart') {
+                            this.$nextTick(() => { this.renderChart(); });
+                        }
+                    });
+                    this.$nextTick(() => { this.renderChart(); });
+                },
+                renderChart() {
+                    const canvas = document.getElementById('chartModA');
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    
+                    if (this.chartInstance) {
+                        this.chartInstance.destroy();
+                    }
+
+                    const gradientA = ctx.createLinearGradient(0, 0, 0, 250);
+                    gradientA.addColorStop(0, 'rgba(0, 62, 126, 0.15)');
+                    gradientA.addColorStop(1, 'rgba(0, 62, 126, 0)');
+
+                    if (this.dataset === 'history') {
+                        this.chartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: this.historicData.dates,
+                                datasets: [
+                                    {
+                                        label: 'Demanda (GWh)',
+                                        data: this.historicData.demands,
+                                        borderColor: '#003E7E',
+                                        backgroundColor: gradientA,
+                                        borderWidth: 1.5,
+                                        tension: 0,
+                                        fill: true,
+                                        pointRadius: 0,
+                                        yAxisID: 'y'
+                                    },
+                                    {
+                                        label: 'Temperatura (°C)',
+                                        data: this.historicData.temps,
+                                        borderColor: '#F47920',
+                                        backgroundColor: 'transparent',
+                                        borderWidth: 1.5,
+                                        tension: 0,
+                                        fill: false,
+                                        pointRadius: 0,
+                                        yAxisID: 'y1'
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { 
+                                    legend: { 
+                                        display: true, 
+                                        position: 'bottom',
+                                        labels: { usePointStyle: true, boxWidth: 6 }
+                                    } 
+                                },
+                                interaction: { mode: 'index', intersect: false },
+                                scales: {
+                                    x: { 
+                                        grid: { display: false }, 
+                                        ticks: { maxTicksLimit: 12 } 
+                                    },
+                                    y: { 
+                                        type: 'linear', 
+                                        display: true, 
+                                        position: 'left',
+                                        title: { display: true, text: 'Demanda (GWh)', font: { size: 10 } },
+                                        grid: { color: '#F1F5F9' } 
+                                    },
+                                    y1: { 
+                                        type: 'linear', 
+                                        display: true, 
+                                        position: 'right',
+                                        title: { display: true, text: 'Temperatura (°C)', font: { size: 10 } },
+                                        grid: { drawOnChartArea: false } 
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        // Forecast Chart
+                        this.chartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: this.forecastData.dates,
+                                datasets: [{
+                                    label: 'Demanda 2027 (GWh)',
+                                    data: this.forecastData.demands,
+                                    borderColor: '#003E7E',
+                                    backgroundColor: gradientA,
+                                    borderWidth: 2,
+                                    tension: 0,
+                                    fill: true,
+                                    pointBackgroundColor: '#FFFFFF',
+                                    pointBorderColor: '#003E7E',
+                                    pointRadius: 4,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    x: { grid: { display: false } },
+                                    y: { grid: { color: '#F1F5F9' } }
+                                }
+                            }
+                        });
+                    }
                 }
             }
-        });
-
-        window.setScenario = function (scenarioKey) {
-            document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.scenario-btn[data-type="${scenarioKey}"]`).classList.add('active');
-
-            const data = scenarios[scenarioKey];
-
-            document.getElementById('dash-cost').innerText = data.cost;
-            document.getElementById('dash-ens').innerText = data.ens;
-            document.getElementById('dash-var').innerText = data.var;
-            document.getElementById('dash-hours').innerText = data.hours;
-
-            let ensColor = 'val-good';
-            let varColor = 'val-good';
-            let hoursColor = 'val-good';
-
-            if (scenarioKey === 'fail') {
-                ensColor = 'val-warn'; varColor = 'val-warn'; hoursColor = 'val-warn';
-            } else if (scenarioKey === 'comb') {
-                ensColor = 'val-bad'; varColor = 'val-bad'; hoursColor = 'val-bad';
-            }
-
-            document.getElementById('dash-ens').className = 'dash-kpi-value ' + ensColor;
-            document.getElementById('dash-var').className = 'dash-kpi-value ' + varColor;
-            document.getElementById('dash-hours').className = 'dash-kpi-value ' + hoursColor;
-
-            const banner = document.getElementById('alert-banner');
-            banner.style.display = scenarioKey === 'comb' ? 'block' : 'none';
-        };
-
-        setScenario('base');
+        }
     </script>
 </body>
 
